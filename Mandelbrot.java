@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-
+// edit
 
 public class Mandelbrot {
 	static final int MAX = 255;
@@ -15,38 +15,59 @@ public class Mandelbrot {
 	public static void main(String[] args) throws FileNotFoundException {
 		Scanner sc = new Scanner(System.in);
 
-		System.out.println("Enter start x-coordinate (Real part)");
-		double x0 = sc.nextDouble();
-
-		System.out.println("Enter start y-coordinate (Imaginary part)");
-		double y0 = sc.nextDouble();
-
-		System.out.println("Enter side length");
-		double s = sc.nextDouble();
-		
-		System.out.println("Enter grid size");
-		int g = sc.nextInt();
-
+		double x0 = getDouble(sc, "Enter start x-coordinate (Real part)");
+		double y0 = getDouble(sc, "Enter start y-coordinate (Imaginary part)");
+		double s = getDouble(sc, "Enter side length");
+		int g = getInt(sc, "Enter grid size");
 		int choice = getChoice(sc);
 		Map<Integer, Color> colorMap = null;
 		
 		if (choice == 1) {
-			System.out.print("Enter name of premade file: ");
-			File file = new File(sc.next());
-			colorMap = loadFile(file);
-		
-		}
-		
-		if (choice == 2) {
+			while(colorMap==null) {
+				System.out.print("Enter name of premade file: ");
+				File file = new File(sc.next());
+				colorMap = loadFile(file);
+			}
+
+
+		}else if (choice == 2) {
 			colorMap = staticColor(StdDraw.RED, StdDraw.WHITE);
-		}
-		
-		if (choice == 3) {
+		}else if (choice == 3) {
 			colorMap = generateRandom();
 		}
 		drawAll(s, x0, y0, g, choice, colorMap);
 	}
-
+	public static double getDouble(Scanner sc, String message) {
+		double i;
+		while(true) {
+			System.out.println(message);
+			try {
+				i = sc.nextDouble();
+				sc.nextLine();
+				return i;
+			} catch (Exception e) {
+				System.out.println("invalid input, try again");
+				sc.nextLine();
+			}
+		}
+	}
+	
+	public static int getInt(Scanner sc, String message) {
+		int i;
+		while(true) {
+			System.out.println(message);
+			try {
+				i = sc.nextInt();
+				sc.nextLine();
+				return i;
+			} catch (Exception e) {
+				System.out.println("invalid input, try again");
+				sc.nextLine();
+			}
+		}
+	}
+	
+	
 	private static Map<Integer, Color> staticColor(Color color1, Color color2) {
 		Map<Integer, Color> fixedColor = new HashMap<>();
 		
@@ -72,18 +93,10 @@ public class Mandelbrot {
 		int choice = 0;
 
 		while (choice != 1 && choice != 2 && choice != 3) {
-			System.out.println("Enter number corresponding to action: \n" 
+			choice = getInt(sc, "Enter number corresponding to action: \n" 
 					+ "1 to load colors from file \n"
 					+ "2 to play from a fixed color \n"
 					+ "3 to play from random colors \n");
-			try {
-				choice = sc.nextInt();
-				sc.nextLine();
-			} catch (Exception e) {
-				System.out.println("invalid input, try again");
-				sc.nextLine();
-				continue;
-			}
 			System.out.println((choice == 1 || choice == 2 || choice == 3) ? "" : "Input not valid, try again");
 		}
 		return choice;
@@ -122,18 +135,21 @@ public class Mandelbrot {
 		StdDraw.show(0);
 	}
 
-	public static Map<Integer, Color> loadFile(File file) throws FileNotFoundException {
-
+	public static Map<Integer, Color> loadFile(File file)  {
 		Map<Integer, Color> allColors = new HashMap<>();
-
-		try (Scanner input = new Scanner(file)) {
-			int i = 0;
-			while (input.hasNextLine()) {
-				Color color = new Color(input.nextInt(), input.nextInt(), input.nextInt());
-				allColors.put(i, color);
-				i++;
-				input.nextLine();
-			}
+		Scanner input;
+		try{
+			input = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found, try again");
+			return null;
+		}
+		int i = 0;
+		while (input.hasNextLine()) {
+			Color color = new Color(input.nextInt(), input.nextInt(), input.nextInt());
+			allColors.put(i, color);
+			i++;
+			input.nextLine();
 		}
 		return allColors;
 	}
